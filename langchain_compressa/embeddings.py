@@ -14,8 +14,10 @@ from typing import (
     Set,
     Tuple,
     Union,
+    Mapping,
 )
 
+import openai
 import tiktoken
 
 from langchain_core.embeddings import Embeddings
@@ -113,7 +115,12 @@ class CompressaEmbeddings(Embeddings):
     compressa_api_base: Optional[str] = Field(default="https://compressa-api.mil-team.ru/v1", alias="base_url")
     chunk_size: int = 1000
     """Maximum number of texts to embed in each batch"""
-
+    max_retries: int = 2
+    """Maximum number of retries to make when generating."""
+    request_timeout: Optional[Union[float, Tuple[float, float], Any]] = Field(
+        default=None, alias="timeout"
+    )
+    """Timeout for requests to Compressa completion API. Can be float, httpx.Timeout or None."""
     client: Any = Field(default=None, exclude=True)  #: :meta private:
     async_client: Any = Field(default=None, exclude=True)  #: :meta private:
 
@@ -131,6 +138,8 @@ class CompressaEmbeddings(Embeddings):
     check_embedding_ctx_length: bool = True
     """Whether to check the token length of inputs and automatically split inputs 
         longer than embedding_ctx_length."""
+    default_headers: Union[Mapping[str, str], None] = None
+    default_query: Union[Mapping[str, object], None] = None
 
     class Config:
         """Configuration for this pydantic object."""
@@ -177,6 +186,30 @@ class CompressaEmbeddings(Embeddings):
         values["compressa_api_base"] = values["compressa_api_base"] or os.getenv(
             "COMPRESSA_API_BASE"
         )
+
+        client_params = {
+            "api_key": (
+                values["compressa_api_key"].get_secret_value()
+                if values["compressa_api_key"]
+                else None
+            ),
+            "base_url": values["compressa_api_base"],
+            "timeout": values["request_timeout"],
+            "max_retries": values["max_retries"],
+            "default_headers": values["default_headers"],
+            "default_query": values["default_query"],
+        }
+        if not values.get("client"):
+            sync_specific = {"http_client": values["http_client"]}
+            values["client"] = openai.OpenAI(
+                **client_params, **sync_specific
+            ).embeddings
+        if not values.get("async_client"):
+            async_specific = {"http_client": values["http_async_client"]}
+            values["async_client"] = openai.AsyncOpenAI(
+                **client_params, **async_specific
+            ).embeddings
+        
         return values
     
     @property
