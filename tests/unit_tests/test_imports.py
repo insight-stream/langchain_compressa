@@ -2,7 +2,6 @@ from langchain_compressa import __all__
 
 EXPECTED_ALL = [
     "CompressaLLM",
-    "ChatCompressa",
     "CompressaEmbeddings",
 ]
 
