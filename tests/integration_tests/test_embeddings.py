@@ -1,5 +1,8 @@
 """Test Compressa embeddings."""
 from langchain_compressa.embeddings import CompressaEmbeddings
+import os
+
+os.environ["COMPRESSA_API_KEY"] = "foo"
 
 
 def test_langchain_compressa_embedding_documents() -> None:

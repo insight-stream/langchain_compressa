@@ -1,5 +1,8 @@
 """Test CompressaLLM llm."""
 from langchain_compressa.llms import CompressaLLM
+import os
+
+os.environ["COMPRESSA_API_KEY"] = "foo"
 
 
 def test_stream() -> None:
