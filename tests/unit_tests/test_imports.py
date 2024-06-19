@@ -3,6 +3,7 @@ from langchain_compressa import __all__
 EXPECTED_ALL = [
     "CompressaLLM",
     "CompressaEmbeddings",
+    "__version__",
 ]
 
 

@@ -72,7 +72,7 @@ class BaseCompressaLLM(BaseLLM):
 
     client: Any = Field(default=None, exclude=True)  #: :meta private:
     async_client: Any = Field(default=None, exclude=True)  #: :meta private:
-    model_name: str = Field(default="gpt-3.5-turbo-instruct", alias="model")
+    model_name: str = Field(default="/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct", alias="model")
     """Model name to use."""
     temperature: float = 0.7
     """What sampling temperature to use."""

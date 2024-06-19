@@ -22,9 +22,11 @@ import tiktoken
 
 from langchain_core.embeddings import Embeddings
 from langchain_core.pydantic_v1 import (
+    BaseModel,
     Extra,
     Field,
     root_validator,
+    SecretStr
 )
 from langchain_core.utils import (
     convert_to_secret_str,
@@ -96,7 +98,7 @@ def _process_batched_chunked_embeddings(
     return embeddings
 
 
-class CompressaEmbeddings(Embeddings):
+class CompressaEmbeddings(BaseModel, Embeddings):
     """CompressaEmbeddings embedding model.
 
     To use, you should have the
@@ -123,18 +125,26 @@ class CompressaEmbeddings(Embeddings):
     """Timeout for requests to Compressa completion API. Can be float, httpx.Timeout or None."""
     client: Any = Field(default=None, exclude=True)  #: :meta private:
     async_client: Any = Field(default=None, exclude=True)  #: :meta private:
-
-    tiktoken_enabled: bool = True
+    tiktoken_enabled: bool = False
     tiktoken_model_name: Optional[str] = "Salesforce/SFR-Embedding-Mistral"
+
     show_progress_bar: bool = False
     """Whether to show a progress bar when embedding."""
-    model_kwargs: Dict[str, Any] = {"encoding_format": float}
+    model_kwargs: Dict[str, Any] = Field(default_factory=dict)
+    compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     """Holds any model parameters valid for `create` call not explicitly specified."""
     allowed_special: Union[Literal["all"], Set[str], None] = None
     disallowed_special: Union[Literal["all"], Set[str], Sequence[str], None] = None
     skip_empty: bool = False
     embedding_ctx_length: int = 8191
     """The maximum number of tokens to embed at once."""
+    http_client: Union[Any, None] = None
+    """Optional httpx.Client. Only used for sync invocations. Must specify 
+        http_async_client as well if you'd like a custom client for async invocations.
+    """
+    http_async_client: Union[Any, None] = None
+    """Optional httpx.AsyncClient. Only used for async invocations. Must specify 
+        http_client as well if you'd like a custom client for sync invocations."""
     check_embedding_ctx_length: bool = True
     """Whether to check the token length of inputs and automatically split inputs 
         longer than embedding_ctx_length."""
@@ -151,7 +161,8 @@ class CompressaEmbeddings(Embeddings):
     def build_extra(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Build extra kwargs from additional params that were passed in."""
         all_required_field_names = get_pydantic_field_names(cls)
-        extra = values.get("model_kwargs", {})
+        extra = values.get("model_kwargs", {"encoding_format": 'float'})
+        
         for field_name in list(values):
             if field_name in extra:
                 raise ValueError(f"Found {field_name} supplied twice.")
