@@ -38,3 +38,30 @@ print(embeddings.embed_query("My query to look up")[:10])
 
 
 print(model.invoke("The meaning of life is"))
+
+
+print("\n Тест чат модели")
+from langchain_compressa.chat_models import ChatCompressa
+
+llm = ChatCompressa(
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+)
+
+print(llm.model_name)
+
+
+messages = [
+    (
+        "system",
+        "You are a helpful assistant that translates English to Russian. Translate the user sentence.",
+    ),
+    ("human", "I love programming."),
+]
+ai_msg = llm.invoke(messages)
+print(ai_msg)
+
+print("\n")
+print(ai_msg.content)
