@@ -39,7 +39,6 @@ llm.invoke("The meaning of life is")
 from langchain_openai import ChatCompressa
 
 llm = ChatCompressa(
-    model="/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct",
     temperature=0,
     max_tokens=None,
     timeout=None,
