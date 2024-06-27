@@ -2,13 +2,13 @@
 name = "langchain-compressa"
 version = "0.1.0"
 description = "An integration package connecting Compressa and LangChain"
-authors = []
+authors = ["insightstream.ru"]
 readme = "README.md"
-repository = "https://github.com/langchain-ai/langchain"
+repository = "https://github.com/insight-stream/langchain_compressa"
 license = "MIT"
 
 [tool.poetry.urls]
-"Source Code" = "https://github.com/langchain-ai/langchain/tree/master/libs/partners/compressa"
+"Source Code" = "https://github.com/insight-stream/langchain_compressa"
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
@@ -22,11 +22,14 @@ torch = ">=2.3.1"
 [tool.poetry.group.test]
 optional = true
 
+[tool.poetry.group.dev.dependencies]
+langchain-core = "^0.2.0"
+
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.3"
 pytest-asyncio = "^0.23.2"
 pytest-socket = "^0.7.0"
-langchain-core = { path = "../../core", develop = true }
+langchain-core = "^0.2.0"
 
 [tool.poetry.group.codespell]
 optional = true
@@ -47,13 +50,9 @@ ruff = "^0.1.8"
 
 [tool.poetry.group.typing.dependencies]
 mypy = "^1.7.1"
-langchain-core = { path = "../../core", develop = true }
 
 [tool.poetry.group.dev]
 optional = true
-
-[tool.poetry.group.dev.dependencies]
-langchain-core = { path = "../../core", develop = true }
 
 [tool.ruff.lint]
 select = [
