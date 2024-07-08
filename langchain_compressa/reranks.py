@@ -5,28 +5,14 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.pydantic_v1 import Extra, root_validator
-from langchain_core.utils import get_from_dict_or_env
 
 import os
 import typing
 import requests
 
-RerankRequestDocumentsItem = typing.Union[str, typing.Dict]
+_RerankRequestDocumentsItem = typing.Union[str, typing.Dict]
 
-class ApiError(Exception):
-    status_code: typing.Optional[int]
-    body: typing.Any
-
-    def __init__(self, *, status_code: typing.Optional[int] = None, body: typing.Any = None):
-        self.status_code = status_code
-        self.body = body
-
-    def __str__(self) -> str:
-        return f"status_code: {self.status_code}, body: {self.body}"
-
-
-class CompressaClient:
+class _CompressaClient:
     """
 
     Parameters
@@ -53,15 +39,15 @@ class CompressaClient:
         api_key : typing.Optional[str] = os.getenv("COMPRESSA_API_KEY"),
     ):
         if api_key is None:
-            raise ApiError(body="The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
+            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
         self._api_key = api_key
         self._base_url = base_url
 
-    def rerank(
+    def _rerank(
         self,
         *,
         query: str,
-        documents: typing.Sequence[RerankRequestDocumentsItem],
+        documents: typing.Sequence[_RerankRequestDocumentsItem],
         model: typing.Optional[str] = "mixedbread-ai/mxbai-rerank-large-v1",
         top_n: typing.Optional[int] = 5,
         return_documents: typing.Optional[bool] = False
@@ -74,7 +60,7 @@ class CompressaClient:
         query : str
             The search query
 
-        documents : typing.Sequence[RerankRequestDocumentsItem]
+        documents : typing.Sequence[_RerankRequestDocumentsItem]
             A list of document objects or strings to rerank.
             If a document is provided the text fields is required and all other fields will be preserved in the response.
 
@@ -138,7 +124,7 @@ class CompressaClient:
         if _response.status_code == 200:
             return _response.json() 
         else:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
+            raise Exception(f"status_code: {_response.status_code}, body: {_response.text}")
 
 
 class CompressaRerank(BaseDocumentCompressor):
@@ -154,23 +140,7 @@ class CompressaRerank(BaseDocumentCompressor):
     """Compressa API key. Must be specified directly or via environment variable 
         COMPRESSA_API_KEY."""
 
-    class Config:
-        """Configuration for this pydantic object."""
-
-        extra = Extra.forbid
-        arbitrary_types_allowed = True
-
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that api key and python package exists in environment."""
-        if not values.get("client"):
-            cohere_api_key = get_from_dict_or_env(
-                values, "compressa_api_key", "COMPRESSA_API_KEY"
-            )
-            values["client"] = CompressaClient(api_key = cohere_api_key)
-        return values
-
-    def rerank(
+    def _rerank(
         self,
         documents: Sequence[Union[str, Document, dict]],
         query: str,
