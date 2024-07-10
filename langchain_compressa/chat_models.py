@@ -128,28 +128,6 @@ class ChatCompressa(BaseChatModel):
         return self.client._stream(messages, stop, run_manager, **kwargs)
 
 
-    async def _astream(
-        self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
-        run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
-        **kwargs: Any,
-    ) -> AsyncIterator[ChatGenerationChunk]:
-        
-        async for chunk in self.client._astream(messages, stop, run_manager, **kwargs):
-            yield chunk
-
-
-    async def _agenerate(
-        self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
-        run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        
-        return await self.client._agenerate(messages, stop, run_manager, **kwargs)
-
     @property
     def _llm_type(self) -> str:
         """Return type of chat model."""

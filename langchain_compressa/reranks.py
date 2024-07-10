@@ -79,7 +79,7 @@ class CompressaRerank(BaseDocumentCompressor):
     """Compressa API key. Must be specified directly or via environment variable 
         COMPRESSA_API_KEY."""
 
-    def rerank(
+    def _rerank(
         self,
         documents: Sequence[Union[str, Document, dict]],
         query: str,
@@ -136,7 +136,7 @@ class CompressaRerank(BaseDocumentCompressor):
             A sequence of compressed documents.
         """
         compressed = []
-        for res in self.rerank(documents, query):
+        for res in self._rerank(documents, query):
             doc = documents[res["index"]]
             doc_copy = Document(doc.page_content, metadata=deepcopy(doc.metadata))
             doc_copy.metadata["relevance_score"] = res["relevance_score"]

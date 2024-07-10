@@ -80,7 +80,6 @@ documents = [
 query = "What is the capital of the United States?"
 
 reranker = CompressaRerank()
-rerank_res = reranker.rerank(query=query,  documents=documents, top_n=3)
 compress_res = reranker.compress_documents(query=query,  documents=documents)
 ```
 
