@@ -99,8 +99,8 @@ from langchain_chroma import Chroma
 
 COMPRESSA_API_KEY = os.getenv('COMPRESSA_API_KEY')
 
-compressa_embedding = CompressaEmbeddings(compressa_api_key=COMPRESSA_API_KEY)
-llm = ChatCompressa(compressa_api_key=COMPRESSA_API_KEY)
+compressa_embedding = CompressaEmbeddings(api_key=COMPRESSA_API_KEY)
+llm = ChatCompressa(api_key=COMPRESSA_API_KEY)
 
 loader = WebBaseLoader("https://docs.smith.langchain.com/overview")
 docs = loader.load()

@@ -12,18 +12,18 @@ from langchain_compressa import (
 
 
 def test_compressa_secrets() -> None:
-    o = ChatCompressa(compressa_api_key="foo")
+    o = ChatCompressa(api_key="foo")
     s = str(o)
     assert "foo" not in s
 
 
 def test_compressa_embeddings_secrets() -> None:
-    o = CompressaEmbeddings(compressa_api_key="foo")
+    o = CompressaEmbeddings(api_key="foo")
     s = str(o)
     assert "foo" not in s
     
 def test_compressa_reranks_secrets() -> None:
-    o = CompressaRerank(compressa_api_key="foo")
+    o = CompressaRerank(api_key="foo")
     s = str(o)
     assert "foo" not in s
 
