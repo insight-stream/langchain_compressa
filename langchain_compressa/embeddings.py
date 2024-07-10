@@ -3,6 +3,7 @@ import os
 
 from langchain_core.embeddings import Embeddings
 from langchain_core.pydantic_v1 import Field, SecretStr, BaseModel
+from langchain_openai import OpenAIEmbeddings
 
 COMPRESSA_API_BASE = "https://compressa-api.mil-team.ru/v1"
 
@@ -30,13 +31,6 @@ class CompressaEmbeddings(BaseModel, Embeddings):
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Embed search docs."""
         
-        try:
-            from langchain_openai import OpenAIEmbeddings
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            subprocess.check_call(['pip', 'install', 'transformers'])
-            from langchain_openai import OpenAIEmbeddings
-        
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
         
         if compressa_api_key is None:
@@ -55,12 +49,6 @@ class CompressaEmbeddings(BaseModel, Embeddings):
 
     def embed_query(self, text: str) -> List[float]:
         """Embed query text."""
-        try:
-            from langchain_openai import OpenAIEmbeddings
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            subprocess.check_call(['pip', 'install', 'transformers'])
-            from langchain_openai import OpenAIEmbeddings
         
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
         
@@ -80,12 +68,6 @@ class CompressaEmbeddings(BaseModel, Embeddings):
 
     async def aembed_documents(self, texts: List[str]) -> List[List[float]]:
         """Asynchronous Embed search docs."""
-        try:
-            from langchain_openai import OpenAIEmbeddings
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            subprocess.check_call(['pip', 'install', 'transformers'])
-            from langchain_openai import OpenAIEmbeddings
         
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
         
@@ -105,12 +87,6 @@ class CompressaEmbeddings(BaseModel, Embeddings):
 
     async def aembed_query(self, text: str) -> List[float]:
         """Asynchronous Embed query text."""
-        try:
-            from langchain_openai import OpenAIEmbeddings
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            subprocess.check_call(['pip', 'install', 'transformers'])
-            from langchain_openai import OpenAIEmbeddings
         
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
         

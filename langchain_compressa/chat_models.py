@@ -14,6 +14,7 @@ from langchain_core.callbacks import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
 )
+from langchain_openai import ChatOpenAI
 import subprocess
 
 COMPRESSA_API_BASE = "https://compressa-api.mil-team.ru/v1"
@@ -94,13 +95,7 @@ class ChatCompressa(BaseChatModel):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
-    
-        try:
-            from langchain_openai import ChatOpenAI
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            from langchain_openai import ChatOpenAI
-        
+       
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
 
         if compressa_api_key is None:
@@ -123,12 +118,6 @@ class ChatCompressa(BaseChatModel):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
-    
-        try:
-            from langchain_openai import ChatOpenAI
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            from langchain_openai import ChatOpenAI
     
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
 
@@ -153,12 +142,6 @@ class ChatCompressa(BaseChatModel):
         run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> AsyncIterator[ChatGenerationChunk]:
-    
-        try:
-            from langchain_openai import ChatOpenAI
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            from langchain_openai import ChatOpenAI
         
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
 
@@ -182,12 +165,6 @@ class ChatCompressa(BaseChatModel):
         run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
-    
-        try:
-            from langchain_openai import ChatOpenAI
-        except ImportError:
-            subprocess.check_call(['pip', 'install', 'langchain_openai'])
-            from langchain_openai import ChatOpenAI
         
         compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
 
