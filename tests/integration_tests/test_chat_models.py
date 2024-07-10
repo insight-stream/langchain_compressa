@@ -18,3 +18,18 @@ def test_invoke() -> None:
 
     result = llm.invoke("I'm Pickle Rick")
     assert isinstance(result.content, str)
+    
+async def test_astream() -> None:
+    """Test streaming tokens from ChatCompressa."""
+    llm = ChatCompressa()
+
+    async for token in llm.astream("I'm Pickle Rick"):
+        assert isinstance(token.content, str)
+
+
+async def test_ainvoke() -> None:
+    """Test invoke tokens from ChatCompressa."""
+    llm = ChatCompressa()
+
+    result = await llm.ainvoke("I'm Pickle Rick")
+    assert isinstance(result.content, str)
