@@ -5,7 +5,7 @@ This package contains the LangChain integration with Compressa
 ## Installation
 
 ```bash
-pip install pip install git+https://github.com/insight-stream/langchain_compressa.git
+pip install git+https://github.com/insight-stream/langchain_compressa.git
 ```
 
 And you should configure credentials by setting the following environment variables:

@@ -21,15 +21,6 @@ class _CompressaClient:
         The base url to use for requests from the client.
 
     api_key : typing.Optional[str]
-    
-    Examples
-    --------
-    import CompressaReranker
-
-    client = CompressaReranker(
-        api_key="YOUR_API_KEY",
-        base_url="YOUR_BASE_URL"
-    )
     """
 
     def __init__(
@@ -52,59 +43,7 @@ class _CompressaClient:
         top_n: typing.Optional[int] = 5,
         return_documents: typing.Optional[bool] = False
     ) -> any:  #TODO: обработать ответ RerankResponse 
-        """
-        This endpoint takes in a query and a list of texts and produces an ordered array with each text assigned a relevance score.
-
-        Parameters
-        ----------
-        query : str
-            The search query
-
-        documents : typing.Sequence[_RerankRequestDocumentsItem]
-            A list of document objects or strings to rerank.
-            If a document is provided the text fields is required and all other fields will be preserved in the response.
-
-            The total max chunks must be less than 10000.
-
-            We recommend a maximum of 1,000 documents for optimal endpoint performance.
-
-        model : typing.Optional[str]
-            The identifier of the model to use
-
-        top_n : typing.Optional[int]
-            The number of most relevant documents or indices to return, defaults to the length of the documents
-
-        return_documents : typing.Optional[bool]
-            - If false, returns results without the doc text - the api will return a list of {index, relevance score} where index is inferred from the list passed into the request.
-            - If true, returns results with the doc text passed in - the api will return an ordered list of {index, text, relevance score} where index + text refers to the list passed into the request.
-
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        RerankResponse
-            OK
-
-        Examples
-        --------
-        from compressaRerenker import CompressaRerenker
-
-        client = CompressaRerenker(
-            api_key="YOUR_KEY",
-        )
-        client.rerank(
-            model="mixedbread-ai/mxbai-rerank-large-v1",
-            query="What is the capital of the United States?",
-            documents=[
-                "Carson City is the capital city of the American state of Nevada.",
-                "The Commonwealth of the Northern Mariana Islands is a group of islands in the Pacific Ocean. Its capital is Saipan.",
-                "Washington, D.C. (also known as simply Washington or D.C., and officially as the District of Columbia) is the capital of the United States. It is a federal district.",
-                "Capital punishment (the death penalty) has existed in the United States since beforethe United States was a country. As of 2017, capital punishment is legal in 30 of the 50 states.",
-            ],
-        )
-        """
+        
         headers = {
             "Content-Type": "application/json",
             "X-Fern-Language": "Python",
@@ -140,7 +79,7 @@ class CompressaRerank(BaseDocumentCompressor):
     """Compressa API key. Must be specified directly or via environment variable 
         COMPRESSA_API_KEY."""
 
-    def _rerank(
+    def rerank(
         self,
         documents: Sequence[Union[str, Document, dict]],
         query: str,
