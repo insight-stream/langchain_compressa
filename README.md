@@ -88,10 +88,11 @@ compress_res = reranker.compress_documents(query=query,  documents=documents)
 
 ```python
 import os
-from langchain_compressa import CompressaEmbeddings, ChatCompressa
+from langchain_compressa import CompressaEmbeddings, ChatCompressa, CompressaRerank
 from langchain_core.documents import Document
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
+from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
@@ -113,6 +114,11 @@ all_splits = text_splitter.split_documents(docs)
 vectorstore = Chroma.from_documents(documents=all_splits, embedding=compressa_embedding)
 retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
+compressor = CompressaRerank(api_key=COMPRESSA_API_KEY)
+compression_retriever = ContextualCompressionRetriever(
+    base_compressor=compressor, base_retriever=retriever
+)
+
 system_template = f"""You are an assistant for question-answering tasks. 
 Use the following pieces of retrieved context to answer the question. 
 If you don't know the answer, just say that you don't know. 
@@ -130,7 +136,7 @@ qa_prompt = ChatPromptTemplate.from_messages([
 
 question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
 
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+rag_chain = create_retrieval_chain(compression_retriever, question_answer_chain)
 
 answ = rag_chain.invoke({"input": "how can langsmith help with testing?"})
 print(answ["answer"])
