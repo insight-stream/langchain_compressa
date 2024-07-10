@@ -8,7 +8,7 @@ from langchain_core.documents import Document
 
 from langchain_compressa import CompressaRerank
 
-os.environ["COMPRESSA_API_KEY"] = "key"
+os.environ["COMPRESSA_API_KEY"] = "key" #set real value before run tests
 
 def test_langchain_cohere_rerank_documents() -> None:
     reranker = CompressaRerank()

@@ -2,7 +2,7 @@
 from langchain_compressa.embeddings import CompressaEmbeddings
 import os
 
-os.environ["COMPRESSA_API_KEY"] = "foo"
+os.environ["COMPRESSA_API_KEY"] = "key" #set real value before run tests
 
 
 def test_langchain_compressa_embedding_documents() -> None:
