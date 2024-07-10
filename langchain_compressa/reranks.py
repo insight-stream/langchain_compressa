@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
+from langchain_core.pydantic_v1 import Field, SecretStr
 
 import os
 import typing
@@ -20,19 +21,20 @@ class _CompressaClient:
     base_url : typing.Optional[str]
         The base url to use for requests from the client.
 
-    api_key : typing.Optional[str]
+    compressa_api_key : typing.Optional[str]
     """
 
     def __init__(
         self,
         *,
         base_url: typing.Optional[str] = os.getenv("COMPRESSA_BASE_URL", "https://compressa-api.mil-team.ru/v1"),
-        api_key : typing.Optional[str] = os.getenv("COMPRESSA_API_KEY"),
+        compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     ):
-        if api_key is None:
+        
+        self.compressa_api_key = compressa_api_key if compressa_api_key else os.getenv("COMPRESSA_API_KEY")
+        if self.compressa_api_key is None:
             raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-        self._api_key = api_key
-        self._base_url = base_url
+        self.base_url = base_url
 
     def _rerank(
         self,
@@ -47,7 +49,7 @@ class _CompressaClient:
         headers = {
             "Content-Type": "application/json",
             "X-Fern-Language": "Python",
-            "Authorization": "Bearer " + self._api_key
+            "Authorization": "Bearer " + self.compressa_api_key
         }
            
         jsonBody = {
@@ -58,7 +60,7 @@ class _CompressaClient:
             "return_documents": return_documents,
             }
 	    
-        _response = requests.post(f"{self._base_url}/rerank", headers=headers, json=jsonBody)
+        _response = requests.post(f"{self.base_url}/rerank", headers=headers, json=jsonBody)
 
         if _response.status_code == 200:
             return _response.json() 
@@ -69,13 +71,11 @@ class _CompressaClient:
 class CompressaRerank(BaseDocumentCompressor):
     """Document compressor that uses `Compressa Rerank API`."""
 
-    client: Any = None
-    """Compressa client to use for compressing documents."""
     top_n: Optional[int] = 3
     """Number of documents to return."""
     model: str = "mixedbread-ai/mxbai-rerank-large-v1"
     """Model to use for reranking."""
-    compressa_api_key: Optional[str] = None
+    compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     """Compressa API key. Must be specified directly or via environment variable 
         COMPRESSA_API_KEY."""
 
@@ -102,8 +102,10 @@ class CompressaRerank(BaseDocumentCompressor):
             doc.page_content if isinstance(doc, Document) else doc for doc in documents
         ]
         model = model or self.model
+        
+        client = _CompressaClient(compressa_api_key=self.compressa_api_key)
         top_n = top_n if (top_n is None or top_n > 0) else self.top_n
-        results = self.client.rerank(
+        results = client._rerank(
             query=query,
             documents=docs,
             model=model,
