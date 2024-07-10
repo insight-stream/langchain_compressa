@@ -154,8 +154,9 @@ class ChatCompressa(BaseChatModel):
             base_url=COMPRESSA_API_BASE,
             api_key=compressa_api_key
         )
-    
-        return llm._astream(messages, stop, run_manager, **kwargs)
+        
+        async for chunk in llm._astream(messages, stop, run_manager, **kwargs):
+            yield chunk
 
 
     async def _agenerate(
@@ -178,7 +179,7 @@ class ChatCompressa(BaseChatModel):
             api_key=compressa_api_key
         )
         
-        return llm._agenerate(messages, stop, run_manager, **kwargs)
+        return await llm._agenerate(messages, stop, run_manager, **kwargs)
 
     @property
     def _llm_type(self) -> str:
