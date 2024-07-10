@@ -27,79 +27,35 @@ class CompressaEmbeddings(BaseModel, Embeddings):
     tiktoken_model_name: Optional[str] = "Salesforce/SFR-Embedding-Mistral"
     model_kwargs: Dict[str, Any] = Field(default={"encoding_format": "float"})
     compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
-
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Embed search docs."""
+    client: Any = Field(default=None, exclude=True)
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
+        self.compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
         
-        if compressa_api_key is None:
-                raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-            
+        if self.compressa_api_key is None:
+            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
+        self.client = self._create_client()
+    
+    def _create_client(self) -> Any:
         embed = OpenAIEmbeddings(
             model=self.model,
             openai_api_base=COMPRESSA_API_BASE,
-            openai_api_key=compressa_api_key,
+            openai_api_key=self.compressa_api_key,
             model_kwargs=self.model_kwargs,
             tiktoken_enabled=self.tiktoken_enabled,
             tiktoken_model_name=self.tiktoken_model_name,
         )
-        
-        return embed.embed_documents(texts)
+        return embed
+    
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Embed search docs."""
+
+        return self.client.embed_documents(texts)
 
     def embed_query(self, text: str) -> List[float]:
         """Embed query text."""
         
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
-        
-        if compressa_api_key is None:
-                raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-            
-        embed = OpenAIEmbeddings(
-            model=self.model,
-            openai_api_base=COMPRESSA_API_BASE,
-            openai_api_key=compressa_api_key,
-            model_kwargs=self.model_kwargs,
-            tiktoken_enabled=self.tiktoken_enabled,
-            tiktoken_model_name=self.tiktoken_model_name,
-        )
-        
-        return embed.embed_query(text)
-
-    async def aembed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Asynchronous Embed search docs."""
-        
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
-        
-        if compressa_api_key is None:
-                raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-            
-        embed = OpenAIEmbeddings(
-            model=self.model,
-            openai_api_base=COMPRESSA_API_BASE,
-            openai_api_key=compressa_api_key,
-            model_kwargs=self.model_kwargs,
-            tiktoken_enabled=self.tiktoken_enabled,
-            tiktoken_model_name=self.tiktoken_model_name,
-        )
-        
-        return embed.aembed_documents(texts)
-
-    async def aembed_query(self, text: str) -> List[float]:
-        """Asynchronous Embed query text."""
-        
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
-        
-        if compressa_api_key is None:
-                raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-            
-        embed = OpenAIEmbeddings(
-            model=self.model,
-            openai_api_base=COMPRESSA_API_BASE,
-            openai_api_key=compressa_api_key,
-            model_kwargs=self.model_kwargs,
-            tiktoken_enabled=self.tiktoken_enabled,
-            tiktoken_model_name=self.tiktoken_model_name,
-        )
-        
-        return embed.aembed_query(text)
+        return self.client.embed_query(text)

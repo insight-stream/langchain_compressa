@@ -86,7 +86,25 @@ class ChatCompressa(BaseChatModel):
     """Automatically inferred from env var `COMPRESSA_API_KEY` if not provided."""
     streaming: bool = False
     """Whether to stream the results or not."""
- 
+    client: Any = Field(default=None, exclude=True)
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        self.compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
+        
+        if self.compressa_api_key is None:
+            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
+        self.client = self._create_client()
+        
+    def _create_client(self) -> Any:
+        llm = ChatOpenAI(
+            model=self.model_name,
+            temperature=self.temperature,
+            base_url=COMPRESSA_API_BASE,
+            api_key=self.compressa_api_key
+        )
+        return llm
 
     def _generate(
         self,
@@ -95,20 +113,8 @@ class ChatCompressa(BaseChatModel):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
-       
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
-
-        if compressa_api_key is None:
-            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-
-        llm = ChatOpenAI(
-            model=self.model_name,
-            temperature=self.temperature,
-            base_url=COMPRESSA_API_BASE,
-            api_key=compressa_api_key
-        )
         
-        return llm._generate(messages, stop, run_manager, **kwargs)
+        return self.client._generate(messages, stop, run_manager, **kwargs)
         
 
     def _stream(
@@ -119,20 +125,7 @@ class ChatCompressa(BaseChatModel):
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
     
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
-
-        if compressa_api_key is None:
-            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-            
-            
-        llm = ChatOpenAI(
-            model=self.model_name,
-            temperature=self.temperature,
-            base_url=COMPRESSA_API_BASE,
-            api_key=compressa_api_key
-        )
-    
-        return llm._stream(messages, stop, run_manager, **kwargs)
+        return self.client._stream(messages, stop, run_manager, **kwargs)
 
 
     async def _astream(
@@ -143,19 +136,7 @@ class ChatCompressa(BaseChatModel):
         **kwargs: Any,
     ) -> AsyncIterator[ChatGenerationChunk]:
         
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
-
-        if compressa_api_key is None:
-            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-            
-        llm = ChatOpenAI(
-            model=self.model_name,
-            temperature=self.temperature,
-            base_url=COMPRESSA_API_BASE,
-            api_key=compressa_api_key
-        )
-        
-        async for chunk in llm._astream(messages, stop, run_manager, **kwargs):
+        async for chunk in self.client._astream(messages, stop, run_manager, **kwargs):
             yield chunk
 
 
@@ -167,19 +148,7 @@ class ChatCompressa(BaseChatModel):
         **kwargs: Any,
     ) -> ChatResult:
         
-        compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY" )
-
-        if compressa_api_key is None:
-            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-            
-        llm = ChatOpenAI(
-            model=self.model_name,
-            temperature=self.temperature,
-            base_url=COMPRESSA_API_BASE,
-            api_key=compressa_api_key
-        )
-        
-        return await llm._agenerate(messages, stop, run_manager, **kwargs)
+        return await self.client._agenerate(messages, stop, run_manager, **kwargs)
 
     @property
     def _llm_type(self) -> str:
