@@ -95,16 +95,13 @@ class ChatCompressa(BaseChatModel):
         
         if self.compressa_api_key is None:
             raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-        self.client = self._create_client()
-        
-    def _create_client(self) -> Any:
-        llm = ChatOpenAI(
+            
+        self.client = ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
             base_url=COMPRESSA_API_BASE,
             api_key=self.compressa_api_key
         )
-        return llm
 
     def _generate(
         self,

@@ -36,10 +36,8 @@ class CompressaEmbeddings(BaseModel, Embeddings):
         
         if self.compressa_api_key is None:
             raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
-        self.client = self._create_client()
-    
-    def _create_client(self) -> Any:
-        embed = OpenAIEmbeddings(
+            
+        self.client = OpenAIEmbeddings(
             model=self.model,
             openai_api_base=COMPRESSA_API_BASE,
             openai_api_key=self.compressa_api_key,
@@ -47,8 +45,6 @@ class CompressaEmbeddings(BaseModel, Embeddings):
             tiktoken_enabled=self.tiktoken_enabled,
             tiktoken_model_name=self.tiktoken_model_name,
         )
-        return embed
-    
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Embed search docs."""
