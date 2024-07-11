@@ -1,51 +1,44 @@
-"""Compressa chat models."""
+"""Чат модели Compressa"""
 
-from typing import Any, List, Optional, Dict, Iterator, AsyncIterator
+from typing import Any, List, Optional, Dict, Iterator
 import os
 
-from langchain_core.callbacks import (
-    CallbackManagerForLLMRun,
-)
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import BaseMessage
 from langchain_core.outputs import ChatGenerationChunk, ChatResult
 from langchain_core.pydantic_v1 import Field, SecretStr
-from langchain_core.callbacks import (
-    AsyncCallbackManagerForLLMRun,
-    CallbackManagerForLLMRun,
-)
+from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_openai import ChatOpenAI
-import subprocess
 
 COMPRESSA_API_BASE = "https://compressa-api.mil-team.ru/v1"
 
 class ChatCompressa(BaseChatModel):
-    """Chat chat model integration.
+    """Интеграция чат моделей.
 
-    Setup:
-        Install ``langchain_compressa`` and set environment variable ``COMPRESSA_API_KEY``.
+    Установка:
+        Установите пакет``langchain_compressa`` и переменную окружения ``COMPRESSA_API_KEY``.
 
         .. code-block:: bash
 
-            pip install pip install git+https://github.com/insight-stream/langchain_compressa.git
-            export COMPRESSA_API_KEY="your-api-key"
+            pip install git+https://github.com/insight-stream/langchain_compressa.git
+            export COMPRESSA_API_KEY="ваш-ключ-здесь"
 
-    Key init args — completion params:
+    Ключевые аргументы инициализации — параметры для комплишн:
         model: str
-            Name of Compressa model to use.
+            Имя модели Compressa для использования.
         temperature: float
-            Sampling temperature.
+            Температура выборки.
 
-    Key init args — client params:
+    Ключевые аргументы инициализации — параметры клиента
         api_key: Optional[str]
-            Compressa API key. If not passed in will be read from env var COMPRESSA_API_KEY.
+            Ключ Compressa API. Если не передан то будет читаться из переменной окружения COMPRESSA_API_KEY.
 
-    See full list of supported init args and their descriptions in the params section.
+    Полный список поддерживаемых аргументов инициализации и их описания см. в разделе параметров.
 
-    Instantiate:
+    Создание экземпляра:
         .. code-block:: python
 
-            from langchain_my_test import ChatCompressa
+            from langchain_compressa import ChatCompressa
 
             llm = ChatCompressa(
                 model="...",
@@ -53,16 +46,16 @@ class ChatCompressa(BaseChatModel):
                 # api_key="...",
             )
 
-    Invoke:
+    Вызов:
         .. code-block:: python
 
             messages = [
-                ("system", "You are a helpful translator. Translate the user sentence to French."),
-                ("human", "I love programming."),
+                ("system", "Ты полезный переводчик. Переведи предложение пользователя на французский."),
+                ("human", "Я люблю программирование."),
             ]
             llm.invoke(messages)
 
-    Stream:
+    Стриминг:
         .. code-block:: python
 
             for chunk in llm.stream(messages):
@@ -77,15 +70,15 @@ class ChatCompressa(BaseChatModel):
     """ 
     
     model_name: str = Field(default="/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct", alias="model")
-    """Model name to use."""
+    """Имя чат модели для использования."""
     temperature: float = 0.7
-    """What sampling temperature to use."""
+    """Температура для использования."""
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
-    """Holds any model parameters valid for `create` call not explicitly specified."""
+    """Содержит любые параметры модели, действительные для вызова create, которые не указаны явно."""
     compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
-    """Automatically inferred from env var `COMPRESSA_API_KEY` if not provided."""
+    """Автоматически берётся из переменной окружения `COMPRESSA_API_KEY` если не предоставлен."""
     streaming: bool = False
-    """Whether to stream the results or not."""
+    """Выполнять стриминг результатов или нет"""
     client: Any = Field(default=None, exclude=True)
     
     def __init__(self, **kwargs):
@@ -127,12 +120,12 @@ class ChatCompressa(BaseChatModel):
 
     @property
     def _llm_type(self) -> str:
-        """Return type of chat model."""
+        """Возвращает тип чат модели."""
         return "chat-compressa"
         
     @property
     def _default_params(self) -> Dict[str, Any]:
-        """Get the default parameters for calling Compressa API."""
+        """Получить параметры по умолчанию для вызова Compressa API."""
         params = {
             "model": self.model_name,
             "stream": self.streaming,
@@ -143,5 +136,5 @@ class ChatCompressa(BaseChatModel):
         
     @property
     def _identifying_params(self) -> Dict[str, Any]:
-        """Get the identifying parameters."""
+        """Получить идентифицирующие параметры."""
         return {"model_name": self.model_name, **self._default_params}

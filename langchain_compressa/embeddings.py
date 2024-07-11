@@ -1,3 +1,5 @@
+"""Embedding модели Compressa"""
+
 from typing import List, Any, Dict, Optional
 import os
 
@@ -9,13 +11,12 @@ COMPRESSA_API_BASE = "https://compressa-api.mil-team.ru/v1"
 
 
 class CompressaEmbeddings(BaseModel, Embeddings):
-    """CompressaEmbeddings embedding model.
+    """CompressaEmbeddings модели embedding.
 
-    To use, you should have the
-    environment variable ``COMPRESSA_API_KEY`` set with your API key or pass it
-    as a named parameter to the constructor.
+    Для использования вам необходимо иметь переменную окружения ``COMPRESSA_API_KEY`` с установленным вашим ключом Compressa API, 
+    или передать ключ как именованный параметр конструктора.
 
-    Example:
+    Пример:
         .. code-block:: python
 
             from langchain_compressa import CompressaEmbeddings
@@ -47,11 +48,11 @@ class CompressaEmbeddings(BaseModel, Embeddings):
         )
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Embed search docs."""
+        """Embed для списка документов"""
 
         return self.client.embed_documents(texts)
 
     def embed_query(self, text: str) -> List[float]:
-        """Embed query text."""
+        """Embed для строкового запроса"""
         
         return self.client.embed_query(text)

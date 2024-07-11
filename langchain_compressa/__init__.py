@@ -7,9 +7,9 @@ from langchain_compressa.reranks import CompressaRerank
 try:
     __version__ = metadata.version(__package__)
 except metadata.PackageNotFoundError:
-    # Case where package metadata is not available.
+    # Случай, когда метаданные пакета недоступны.
     __version__ = ""
-del metadata  # optional, avoids polluting the results of dir(__package__)
+del metadata  # необязательно, позволяет избежать загрязнения результатов dir(__package__)
 
 __all__ = [
     "CompressaEmbeddings",

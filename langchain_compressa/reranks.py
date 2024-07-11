@@ -1,5 +1,9 @@
+"""Rerank модели Compressa"""
+
 from __future__ import annotations
 
+import os
+import requests
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Sequence, Union
 
@@ -7,27 +11,24 @@ from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.pydantic_v1 import Field, SecretStr
 
-import os
-import typing
-import requests
 
-_RerankRequestDocumentsItem = typing.Union[str, typing.Dict]
+_RerankRequestDocumentsItem = Union[str, Dict]
 
 class _CompressaClient:
     """
-
-    Parameters
+    Параметры:
     ----------
     base_url : typing.Optional[str]
-        The base url to use for requests from the client.
+        Базовый URL-адрес, который будет использоваться для запросов от клиента.
 
     compressa_api_key : typing.Optional[str]
+        Ключ Compressa API.
     """
 
     def __init__(
         self,
         *,
-        base_url: typing.Optional[str] = os.getenv("COMPRESSA_BASE_URL", "https://compressa-api.mil-team.ru/v1"),
+        base_url: Optional[str] = os.getenv("COMPRESSA_BASE_URL", "https://compressa-api.mil-team.ru/v1"),
         compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     ):
         
@@ -40,10 +41,10 @@ class _CompressaClient:
         self,
         *,
         query: str,
-        documents: typing.Sequence[_RerankRequestDocumentsItem],
-        model: typing.Optional[str] = "mixedbread-ai/mxbai-rerank-large-v1",
-        top_n: typing.Optional[int] = 5,
-        return_documents: typing.Optional[bool] = False
+        documents: Sequence[_RerankRequestDocumentsItem],
+        model: Optional[str] = "mixedbread-ai/mxbai-rerank-large-v1",
+        top_n: Optional[int] = 5,
+        return_documents: Optional[bool] = False
     ) -> any:  #TODO: обработать ответ RerankResponse 
         
         headers = {
@@ -69,15 +70,14 @@ class _CompressaClient:
 
 
 class CompressaRerank(BaseDocumentCompressor):
-    """Document compressor that uses `Compressa Rerank API`."""
+    """Компрессор документов который использует `Compressa Rerank API`."""
 
     top_n: Optional[int] = 3
-    """Number of documents to return."""
+    """Количество возвращаемых документов."""
     model: str = "mixedbread-ai/mxbai-rerank-large-v1"
-    """Model to use for reranking."""
+    """Модель Compressa, используемая для реранка"""
     compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
-    """Compressa API key. Must be specified directly or via environment variable 
-        COMPRESSA_API_KEY."""
+    """Ключ Compressa API. Может быть определён непосредственно или путём установки переменной окружения COMPRESSA_API_KEY."""
 
     def _rerank(
         self,
@@ -87,16 +87,16 @@ class CompressaRerank(BaseDocumentCompressor):
         model: Optional[str] = None,
         top_n: Optional[int] = -1,
     ) -> List[Dict[str, Any]]:
-        """Returns an ordered list of documents ordered by their relevance to the provided query.
+        """Возвращает список документов, упорядоченный по их релевантности предоставленному запросу.
 
         Args:
-            query: The query to use for reranking.
-            documents: A sequence of documents to rerank.
-            model: The model to use for re-ranking. Default to self.model.
-            top_n : The number of results to return. If None returns all results.
-                Defaults to self.top_n.
+            query: Запрос, используемый для реранка.
+            documents: Последовательность документов для реранка.
+            model: Модель, используемая для реранкинга. По умолчанию self.model.
+            top_n : Количество результатов для возвращения. Если None возвращаются все результаты.
+                По умолчанию self.top_n.
         """
-        if len(documents) == 0:  # to avoid empty api call
+        if len(documents) == 0:  # чтобы избегать пустых вызовов API
             return []
         docs = [
             doc.page_content if isinstance(doc, Document) else doc for doc in documents
@@ -125,15 +125,15 @@ class CompressaRerank(BaseDocumentCompressor):
         callbacks: Optional[Callbacks] = None,
     ) -> Sequence[Document]:
         """
-        Compress documents using Compressa's rerank API.
+        Сжатие (compress) документов с использованием Compressa rerank API.
 
         Args:
-            documents: A sequence of documents to compress.
-            query: The query to use for compressing the documents.
-            callbacks: Callbacks to run during the compression process.
+            documents: Последовательность документов для сжатия.
+            query: Запрос, используемый для компрессии документов.
+            callbacks: Обратные вызовы для запуска во время процесса сжатия.
 
         Returns:
-            A sequence of compressed documents.
+            Последовательность сжатых документов.
         """
         compressed = []
         for res in self._rerank(documents, query):
