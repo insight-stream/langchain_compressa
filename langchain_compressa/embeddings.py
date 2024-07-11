@@ -33,15 +33,15 @@ class CompressaEmbeddings(BaseModel, Embeddings):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        self.compressa_api_key = self.compressa_api_key if self.compressa_api_key else SecretStr(os.getenv("COMPRESSA_API_KEY"))
+        compressa_api_key = self.compressa_api_key or SecretStr(os.getenv("COMPRESSA_API_KEY"))
         
-        if self.compressa_api_key is None:
+        if compressa_api_key is None:
             raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
             
         self.client = OpenAIEmbeddings(
             model=self.model,
             openai_api_base=COMPRESSA_API_BASE,
-            openai_api_key=self.compressa_api_key,
+            openai_api_key=compressa_api_key,
             model_kwargs=self.model_kwargs,
             tiktoken_enabled=self.tiktoken_enabled,
             tiktoken_model_name=self.tiktoken_model_name,

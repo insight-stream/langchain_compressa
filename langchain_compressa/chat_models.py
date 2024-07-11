@@ -84,16 +84,16 @@ class ChatCompressa(BaseChatModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        self.compressa_api_key = self.compressa_api_key if self.compressa_api_key else SecretStr(os.getenv("COMPRESSA_API_KEY"))
+        compressa_api_key = self.compressa_api_key or SecretStr(os.getenv("COMPRESSA_API_KEY"))
         
-        if self.compressa_api_key is None:
+        if compressa_api_key is None:
             raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
             
         self.client = ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
             base_url=COMPRESSA_API_BASE,
-            api_key=self.compressa_api_key
+            api_key=compressa_api_key
         )
 
     def _generate(
