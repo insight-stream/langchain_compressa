@@ -84,7 +84,7 @@ class ChatCompressa(BaseChatModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        self.compressa_api_key = self.compressa_api_key if self.compressa_api_key else os.getenv("COMPRESSA_API_KEY")
+        self.compressa_api_key = self.compressa_api_key if self.compressa_api_key else SecretStr(os.getenv("COMPRESSA_API_KEY"))
         
         if self.compressa_api_key is None:
             raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")

@@ -32,9 +32,7 @@ class _CompressaClient:
         compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     ):
         
-        self.compressa_api_key = compressa_api_key.get_secret_value() if compressa_api_key else os.getenv("COMPRESSA_API_KEY")
-        if self.compressa_api_key is None:
-            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
+        self.compressa_api_key = compressa_api_key
         self.base_url = base_url
 
     def _rerank(
@@ -50,7 +48,7 @@ class _CompressaClient:
         headers = {
             "Content-Type": "application/json",
             "X-Fern-Language": "Python",
-            "Authorization": "Bearer " + self.compressa_api_key
+            "Authorization": "Bearer " + self.compressa_api_key.get_secret_value()
         }
            
         jsonBody = {
@@ -78,6 +76,17 @@ class CompressaRerank(BaseDocumentCompressor):
     """Модель Compressa, используемая для реранка"""
     compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     """Ключ Compressa API. Может быть определён непосредственно или путём установки переменной окружения COMPRESSA_API_KEY."""
+    client: Any = Field(default=None, exclude=True)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        self.compressa_api_key = self.compressa_api_key if self.compressa_api_key else SecretStr(os.getenv("COMPRESSA_API_KEY"))
+        
+        if self.compressa_api_key is None:
+            raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
+            
+        self.client = _CompressaClient(compressa_api_key=self.compressa_api_key)
 
     def _rerank(
         self,
@@ -103,9 +112,8 @@ class CompressaRerank(BaseDocumentCompressor):
         ]
         model = model or self.model
         
-        client = _CompressaClient(compressa_api_key=self.compressa_api_key)
         top_n = top_n if (top_n is None or top_n > 0) else self.top_n
-        results = client._rerank(
+        results = self.client._rerank(
             query=query,
             documents=docs,
             model=model,
