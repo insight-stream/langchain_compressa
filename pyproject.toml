@@ -2,13 +2,13 @@
 name = "langchain-compressa"
 version = "0.1.0"
 description = "An integration package connecting Compressa and LangChain"
-authors = ["insightstream.ru"]
+authors = ["compressa.ai"]
 readme = "README.md"
-repository = "https://github.com/insight-stream/langchain_compressa"
+repository = "https://github.com/compressa-ai/langchain_compressa"
 license = "MIT"
 
 [tool.poetry.urls]
-"Source Code" = "https://github.com/insight-stream/langchain_compressa"
+"Source Code" = "https://github.com/compressa-ai/langchain_compressa"
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
