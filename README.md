@@ -5,7 +5,7 @@
 ## Установка
 
 ```bash
-pip install git+https://github.com/insight-stream/langchain_compressa.git
+pip install langchain-compressa
 ```
 
 И вам следует настроить учетные данные, установив следующую переменную окружения:  
