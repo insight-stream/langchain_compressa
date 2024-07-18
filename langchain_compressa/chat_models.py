@@ -69,7 +69,7 @@ class ChatCompressa(BaseChatModel):
    
     """ 
     
-    model_name: str = Field(default="/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct", alias="model")
+    model_name: str = Field(default="Compressa-LLM", alias="model")
     """Имя чат модели для использования."""
     temperature: float = 0.7
     """Температура для использования."""

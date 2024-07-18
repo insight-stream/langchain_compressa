@@ -40,7 +40,7 @@ class _CompressaClient:
         *,
         query: str,
         documents: Sequence[_RerankRequestDocumentsItem],
-        model: Optional[str] = "mixedbread-ai/mxbai-rerank-large-v1",
+        model: Optional[str] = "Compressa-ReRank",
         top_n: Optional[int] = 5,
         return_documents: Optional[bool] = False
     ) -> any:  #TODO: обработать ответ RerankResponse 
@@ -72,7 +72,7 @@ class CompressaRerank(BaseDocumentCompressor):
 
     top_n: Optional[int] = 3
     """Количество возвращаемых документов."""
-    model: str = "mixedbread-ai/mxbai-rerank-large-v1"
+    model: str = "Compressa-ReRank"
     """Модель Compressa, используемая для реранка"""
     compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     """Ключ Compressa API. Может быть определён непосредственно или путём установки переменной окружения COMPRESSA_API_KEY."""

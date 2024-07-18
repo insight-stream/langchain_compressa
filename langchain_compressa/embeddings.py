@@ -23,7 +23,7 @@ class CompressaEmbeddings(BaseModel, Embeddings):
 
             model = CompressaEmbeddings()
     """
-    model: str = "/app/resources/models/models/Salesforce_SFR-Embedding-Mistral"
+    model: str = "Compressa-Embedding"
     tiktoken_enabled: bool = False
     tiktoken_model_name: Optional[str] = "Salesforce/SFR-Embedding-Mistral"
     model_kwargs: Dict[str, Any] = Field(default={"encoding_format": "float"})
