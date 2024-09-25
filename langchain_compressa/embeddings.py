@@ -4,7 +4,7 @@ from typing import List, Any, Dict, Optional
 import os
 
 from langchain_core.embeddings import Embeddings
-from langchain_core.pydantic_v1 import Field, SecretStr, BaseModel
+from pydantic import Field, SecretStr, BaseModel
 from langchain_openai import OpenAIEmbeddings
 
 COMPRESSA_API_BASE = "https://compressa-api.mil-team.ru/v1"
@@ -28,6 +28,9 @@ class CompressaEmbeddings(BaseModel, Embeddings):
     tiktoken_model_name: Optional[str] = "Salesforce/SFR-Embedding-Mistral"
     model_kwargs: Dict[str, Any] = Field(default={"encoding_format": "float"})
     compressa_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
+    """Автоматически берётся из переменной окружения `COMPRESSA_API_KEY` если не предоставлен."""
+    compressa_api_base: Optional[str] = Field(default=None, alias="base_url")
+    """базовый путь URL для API запросов"""
     client: Any = Field(default=None, exclude=True)
     
     def __init__(self, **kwargs):
@@ -38,9 +41,11 @@ class CompressaEmbeddings(BaseModel, Embeddings):
         if compressa_api_key is None:
             raise Exception("status_code: None, body: The client must be instantiated be either passing in api_key or setting COMPRESSA_API_KEY")
             
+        compressa_api_base = self.compressa_api_base or COMPRESSA_API_BASE
+        
         self.client = OpenAIEmbeddings(
             model=self.model,
-            openai_api_base=COMPRESSA_API_BASE,
+            openai_api_base=compressa_api_base,
             openai_api_key=compressa_api_key,
             model_kwargs=self.model_kwargs,
             tiktoken_enabled=self.tiktoken_enabled,
